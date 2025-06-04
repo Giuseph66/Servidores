@@ -41,38 +41,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Endpoint para gerar comprovante
-app.post('/gerar-comprovante', async (req, res) => {
-  try {
-    const { payment_id, status, amount, payer, date } = req.body;
-
-    let html = fs.readFileSync('./template.html', 'utf8');
-    html = html.replace('{{payment_id}}', payment_id)
-               .replace('{{status}}', status)
-               .replace('{{amount}}', amount)
-               .replace('{{payer}}', payer)
-               .replace('{{date}}', date);
-
-    const browser = await puppeteer.launch({ headless: 'new' });
-    const page = await browser.newPage();
-
-    await page.setContent(html, { waitUntil: 'domcontentloaded' });
-    const buffer = await page.screenshot({ type: 'png' });
-
-    await browser.close();
-
-    const base64Image = buffer.toString('base64');
-
-    res.json({
-      base64: base64Image,
-      mime: 'image/png',
-      filename: `comprovante_${payment_id}.png`
-    });
-  } catch (error) {
-    console.error('Erro ao gerar comprovante:', error);
-    res.status(500).json({ error: 'Erro ao gerar comprovante' });
-  }
-});
 
 // Webhook to receive payment notifications
 app.post('/webhook', async (req, res) => {
@@ -276,6 +244,10 @@ app.get('/failure', (req, res) => {
 // Pending page
 app.get('/pending', (req, res) => {
   res.send('Payment pending!');
+});
+
+app.get('/', (req, res) => {
+  res.status(200).send('Tudo funcionando aqui!!!');
 });
 
 // Error handling middleware
