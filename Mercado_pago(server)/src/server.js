@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 
 const token = 'APP_USR-5874249072568848-052123-21e235f828a3ab2fc1f11090d80f92a2-267745032';
-const DOMINIO = 'https://8299-168-228-93-241.ngrok-free.app';
+const DOMINIO = 'https://1a2e-177-39-129-8.ngrok-free.app';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -88,7 +88,6 @@ app.post('/webhook', async (req, res) => {
                 throw new Error('Dados de referência inválidos');
               }
 
-              const qr_code_base64 = paymentInfo.point_of_interaction?.transaction_data?.qr_code_base64 || null;
               const comprovante = null;
               console.log('Receipt image available:', !!comprovante);
               // Gerar o comprovante
@@ -100,7 +99,6 @@ app.post('/webhook', async (req, res) => {
                 .replace('{{amount}}', paymentInfo.transaction_amount)
                 .replace('{{payer}}', externalRef.userName || 'Cliente')
                 .replace('{{date}}', new Date(paymentInfo.date_approved).toLocaleString('pt-BR'))
-                .replace('{{qr_code}}', qr_code_base64);
 
               const browser = await puppeteer.launch({ 
                 headless: 'new',
@@ -110,7 +108,7 @@ app.post('/webhook', async (req, res) => {
 
               await page.setViewport({
                 width: 800,
-                height: 1000,
+                height: 800,
                 deviceScaleFactor: 2
               });
 
@@ -129,12 +127,12 @@ app.post('/webhook', async (req, res) => {
               const paymentRef = doc(db, 'payments', externalRef.Id_banco);
               await updateDoc(paymentRef, { 
                 status: 'approved',
-                receiptImage: `data:image/png;base64,${base64Image}`,
+                receiptImage: `data:image/png;base64,${base64Image}` || null,
                 paymentDetails: {
-                  transactionId: paymentInfo.transaction_details?.transaction_id,
-                  paymentMethod: paymentInfo.payment_method_id,
-                  amount: paymentInfo.transaction_amount,
-                  date: paymentInfo.date_approved
+                  transactionId: paymentInfo.transaction_details?.transaction_id || null,
+                  paymentMethod: paymentInfo.payment_method_id || null,
+                  amount: paymentInfo.transaction_amount || null,
+                  date: paymentInfo.date_approved || null
                 }
               });
 
@@ -168,10 +166,10 @@ app.post('/webhook', async (req, res) => {
               await updateDoc(paymentRef, { 
                 status: 'rejected',
                 paymentDetails: {
-                  transactionId: paymentInfo.transaction_details?.transaction_id,
-                  paymentMethod: paymentInfo.payment_method_id,
-                  amount: paymentInfo.transaction_amount,
-                  date: paymentInfo.date_last_updated
+                  transactionId: paymentInfo.transaction_details?.transaction_id || null,
+                  paymentMethod: paymentInfo.payment_method_id || null,
+                  amount: paymentInfo.transaction_amount || null,
+                  date: paymentInfo.date_last_updated || null
                 }
               });
 
@@ -206,7 +204,9 @@ app.post('/webhook', async (req, res) => {
     res.sendStatus(500);
   }
 });
-
+app.get('/webhook', (req, res) => {
+  res.send('Voce nao deveria estar aqui!');
+});
 app.get('/verificar_pagamento/:paymentId', async (req, res) => {
   try {
     console.log('Verificando pagamento:', req.params.paymentId);
@@ -247,6 +247,7 @@ app.get('/pending', (req, res) => {
 });
 
 app.get('/', (req, res) => {
+  console.log('Tudo funcionando aqui!!!');
   res.status(200).send('Tudo funcionando aqui!!!');
 });
 
