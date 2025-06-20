@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ ALERTA DE SEGURANÇA ⚠️</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --glitch-color: #ff0000;
+            --text-color: #00ff00;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: var(--text-color);
+            font-family: 'Share Tech Mono', monospace;
+            overflow-y: auto;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            animation: glitch 0.3s infinite;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--glitch-color);
+            box-shadow: 0 0 20px var(--glitch-color);
+            position: relative;
+            z-index: 1;
+            margin-bottom: 100px;
+        }
+
+        .warning-header {
+            text-align: center;
+            color: var(--glitch-color);
+            font-size: 2em;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            animation: blink 1s infinite;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .data-card {
+            background: rgba(255, 0, 0, 0.1);
+            padding: 15px;
+            border: 1px solid var(--glitch-color);
+            position: relative;
+        }
+
+        .data-card h3 {
+            color: var(--glitch-color);
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+        }
+
+        .data-card p {
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        .webcam-container {
+            width: 320px;
+            height: 240px;
+            background: #000;
+            margin: 20px auto;
+            border: 2px solid var(--glitch-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .webcam-feed {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--glitch-color);
+            font-size: 1.2em;
+        }
+
+        .loading-dots::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+
+        .exit-button {
+            position: sticky;
+            bottom: 20px;
+            z-index: 1002;
+            margin: 30px auto;
+            display: block;
+            width: 200px;
+            padding: 15px 30px;
+            background: var(--glitch-color);
+            color: #000;
+            border: none;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2em;
+            cursor: pointer;
+            text-transform: uppercase;
+            animation: pulse 1s infinite;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.8em;
+            color: var(--glitch-color);
+            padding-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .binary-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .alert {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 0, 0, 0.9);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            animation: slideIn 0.5s ease-out;
+            z-index: 1001;
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        /* Estilização da barra de rolagem */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--glitch-color);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff3333;
+        }
+
+        /* Ajuste para dispositivos móveis */
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .webcam-container {
+                width: 100%;
+                height: 200px;
+            }
+        }
+
+        .suspicious-ads {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--glitch-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .suspicious-ads::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255, 0, 0, 0.1),
+                rgba(255, 0, 0, 0.1) 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            animation: glitch 0.5s infinite;
+        }
+
+        .ad-item {
+            background: rgba(255, 0, 0, 0.2);
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 3px solid var(--glitch-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ad-item::after {
+            content: 'ANÚNCIO SUSPEITO';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 0.7em;
+            color: var(--glitch-color);
+            animation: blink 1s infinite;
+        }
+
+        .ad-item h3 {
+            color: var(--glitch-color);
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+        }
+
+        .ad-item p {
+            margin: 0;
+            font-size: 0.9em;
+            color: #ff6666;
+        }
+
+        .ad-item .price {
+            color: #ff0000;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+
+        .ad-item .contact {
+            font-size: 0.8em;
+            color: #ff3333;
+            margin-top: 5px;
+        }
+
+        .warning-text {
+            text-align: center;
+            color: var(--glitch-color);
+            font-size: 1.2em;
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid var(--glitch-color);
+            animation: blink 2s infinite;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .modal-content {
+            background: #000;
+            padding: 30px;
+            border: 2px solid var(--glitch-color);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            animation: glitch 0.3s infinite;
+            box-shadow: 0 0 20px var(--glitch-color);
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255, 0, 0, 0.1),
+                rgba(255, 0, 0, 0.1) 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            pointer-events: none;
+        }
+
+        .modal-title {
+            color: var(--glitch-color);
+            font-size: 1.8em;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            animation: blink 1s infinite;
+        }
+
+        .modal-text {
+            color: #ff6666;
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-price {
+            color: var(--glitch-color);
+            font-size: 1.4em;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+
+        .modal-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto 0;
+            padding: 15px 30px;
+            background: var(--glitch-color);
+            color: #000;
+            border: none;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2em;
+            cursor: pointer;
+            text-transform: uppercase;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .typing-effect {
+            overflow: hidden;
+            border-right: 2px solid var(--glitch-color);
+            white-space: nowrap;
+            margin: 0 auto;
+            animation: typing 3.5s steps(40, end),
+                       blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--glitch-color) }
+        }
+    </style>
+</head>
+<body>
+    <div class="glitch-overlay"></div>
+    <div class="binary-rain"></div>
+
+    <div class="container">
+        <h1 class="warning-header">⚠️ ALERTA DE SEGURANÇA ⚠️</h1>
+        
+        <div class="warning-text">
+            ATENÇÃO: Você acessou um servidor privado monitorado. Sua identidade está sendo verificada.
+        </div>
+
+        <div class="data-grid">
+            <div class="data-card">
+                <h3>IP Detectado</h3>
+                <p id="ip-address">192.168.1.1</p>
+            </div>
+            <div class="data-card">
+                <h3>Localização</h3>
+                <p id="location">Lat: -23.5505, Long: -46.6333</p>
+            </div>
+            <div class="data-card">
+                <h3>Navegador</h3>
+                <p id="browser">Mozilla/5.0 (Windows NT 10.0; Win64; x64)</p>
+            </div>
+            <div class="data-card">
+                <h3>Sistema Operacional</h3>
+                <p id="os">Windows 10 Pro</p>
+            </div>
+        </div>
+
+        <div class="webcam-container">
+            <div class="webcam-feed">
+                Ativando câmera<span class="loading-dots"></span>
+            </div>
+        </div>
+
+        <div class="suspicious-ads">
+            <h2 style="color: var(--glitch-color); text-align: center; margin-bottom: 20px;">ANÚNCIOS SUSPEITOS DETECTADOS</h2>
+            
+            <div class="ad-item">
+                <h3>DADOS PESSOAIS À VENDA</h3>
+                <p>Pacote completo de dados pessoais disponível</p>
+                <p>Inclui: Nome, CPF, Endereço, Cartões</p>
+                <p class="price">Preço: R$ 1.500,00</p>
+                <p class="contact">Contato: darkweb@tor.net</p>
+            </div>
+
+            <div class="ad-item">
+                <h3>CLONAGEM DE CARTÃO</h3>
+                <p>Serviço profissional de clonagem</p>
+                <p>Garantia de sucesso em 24h</p>
+                <p class="price">Preço: R$ 2.000,00</p>
+                <p class="contact">Contato: clone@darknet.com</p>
+            </div>
+
+            <div class="ad-item">
+                <h3>HACKING DE CONTAS</h3>
+                <p>Acesso completo a qualquer conta</p>
+                <p>Redes sociais, bancos, emails</p>
+                <p class="price">Preço: R$ 3.000,00</p>
+                <p class="contact">Contato: hack@deepweb.org</p>
+            </div>
+
+            <div class="ad-item">
+                <h3>ROUBO DE IDENTIDADE</h3>
+                <p>Serviço completo de roubo de identidade</p>
+                <p>Documentos falsos incluídos</p>
+                <p class="price">Preço: R$ 5.000,00</p>
+                <p class="contact">Contato: identity@darkweb.net</p>
+            </div>
+        </div>
+
+        <div class="warning-text">
+            ⚠️ ESTE ACESSO ESTÁ SENDO MONITORADO E REGISTRADO ⚠️
+        </div>
+            <button class="exit-button" onclick="window.location.href='https://google.com'">SAIR IMEDIATAMENTE</button>
+
+        <div class="footer">
+            <p>Rastreamento de IP em tempo real: <span id="ip-tracking">192.168.1.1</span></p>
+            <p>Este acesso está sendo monitorado e registrado</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="welcomeModal">
+        <div class="modal-content">
+            <h2 class="modal-title">OBRIGADO POR ACESSAR!</h2>
+            <div class="modal-text">
+                <p>Seus dados foram coletados com sucesso!</p>
+                <p>Informações pessoais, localização e acesso à câmera foram registrados.</p>
+                <p>Seus dados serão vendidos no mercado negro por um excelente preço.</p>
+            </div>
+            <div class="modal-price">
+                VALOR ESTIMADO: R$ 5.000,00
+            </div>
+            <div class="modal-text typing-effect">
+                Iniciando processo de extração de dados...
+            </div>
+            <button class="modal-button" onclick="closeModal()">CONTINUAR</button>
+        </div>
+    </div>
+
+    <script>
+        // Elementos do DOM
+        const elements = {
+            ipAddress: document.getElementById('ip-address'),
+            location: document.getElementById('location'),
+            browser: document.getElementById('browser'),
+            os: document.getElementById('os'),
+            ipTracking: document.getElementById('ip-tracking'),
+            webcamFeed: document.querySelector('.webcam-feed'),
+            dataCard: document.querySelector('.data-card')
+        };
+
+        // Cache para evitar recriação de elementos
+        let hardwareInfoAdded = false;
+
+        // Função para obter IP real
+        async function getIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                elements.ipAddress.textContent = data.ip;
+                elements.ipTracking.textContent = data.ip;
+            } catch (error) {
+                console.error('Erro ao obter IP:', error);
+            }
+        }
+
+        // Função para obter localização
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const long = position.coords.longitude;
+                        elements.location.textContent = 
+                            `Lat: ${lat.toFixed(6)}, Long: ${long.toFixed(6)}`;
+                    },
+                    (error) => {
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                elements.location.textContent = 'Lat: -23.5505, Long: -46.6333';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                elements.location.textContent = 'Lat: -23.5505, Long: -46.6333';
+                                break;
+                            case error.TIMEOUT:
+                                elements.location.textContent = 'Lat: -23.5505, Long: -46.6333';
+                                break;
+                            default:
+                                elements.location.textContent = 'Lat: -23.5505, Long: -46.6333';
+                                break;
+                        }
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                elements.location.textContent = 'Geolocalização não suportada';
+            }
+        }
+
+        // Função para obter dados do sistema
+        function getSystemInfo() {
+            // Dados do navegador e sistema
+            elements.browser.textContent = navigator.userAgent;
+            elements.os.textContent = navigator.platform;
+
+            // Adicionar informações de hardware apenas uma vez
+            if (!hardwareInfoAdded) {
+                if (navigator.deviceMemory) {
+                    const memoryInfo = document.createElement('p');
+                    memoryInfo.textContent = `Memória: ${navigator.deviceMemory} GB`;
+                    elements.dataCard.appendChild(memoryInfo);
+                }
+
+                if (navigator.hardwareConcurrency) {
+                    const cpuInfo = document.createElement('p');
+                    cpuInfo.textContent = `Núcleos de CPU: ${navigator.hardwareConcurrency}`;
+                    elements.dataCard.appendChild(cpuInfo);
+                }
+
+                if (navigator.connection) {
+                    const networkInfo = document.createElement('p');
+                    networkInfo.textContent = `Tipo de Conexão: ${navigator.connection.effectiveType}`;
+                    elements.dataCard.appendChild(networkInfo);
+                }
+
+                const languageInfo = document.createElement('p');
+                languageInfo.textContent = `Idioma: ${navigator.language}`;
+                elements.dataCard.appendChild(languageInfo);
+
+                const screenInfo = document.createElement('p');
+                screenInfo.textContent = `Resolução: ${window.screen.width}x${window.screen.height}`;
+                elements.dataCard.appendChild(screenInfo);
+
+                hardwareInfoAdded = true;
+            }
+        }
+
+        // Função para acessar webcam
+        function getWebcam() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then((stream) => {
+                        const video = document.createElement('video');
+                        video.srcObject = stream;
+                        video.style.width = '100%';
+                        video.style.height = '100%';
+                        video.style.objectFit = 'cover';
+                        
+                        elements.webcamFeed.innerHTML = '';
+                        elements.webcamFeed.appendChild(video);
+                        video.play();
+                    })
+                    .catch((error) => {
+                        elements.webcamFeed.textContent = 'Câmera acessada com sucesso';
+                    });
+            }
+        }
+
+        // Função principal para atualizar dados
+        async function updateUserData() {
+            await getIP();
+            getLocation();
+            getSystemInfo();
+            getWebcam();
+        }
+
+        // Inicializar dados
+        updateUserData();
+
+        // Atualizar apenas o IP a cada 5 segundos
+        setInterval(getIP, 5000);
+
+        // Criar efeito de chuva binária
+        function createBinaryRain() {
+            const container = document.querySelector('.binary-rain');
+            const columns = Math.floor(window.innerWidth / 20);
+            
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.style.position = 'absolute';
+                column.style.left = `${i * 20}px`;
+                column.style.top = '-20px';
+                column.style.color = 'rgba(0, 255, 0, 0.3)';
+                column.style.fontSize = '20px';
+                column.style.fontFamily = 'monospace';
+                column.textContent = Math.random() > 0.5 ? '1' : '0';
+                container.appendChild(column);
+
+                let position = -20;
+                setInterval(() => {
+                    position += 20;
+                    if (position > window.innerHeight) {
+                        position = -20;
+                        column.textContent = Math.random() > 0.5 ? '1' : '0';
+                    }
+                    column.style.top = `${position}px`;
+                }, 100 + Math.random() * 200);
+            }
+        }
+
+        // Iniciar efeitos
+        createBinaryRain();
+
+        // Simular alertas de antivírus
+        function showRandomAlert() {
+            const alerts = [
+                '⚠️ Ameaça detectada: Tentativa de acesso não autorizado',
+                '⚠️ Firewall bloqueando conexões suspeitas',
+                '⚠️ Sistema de segurança ativado',
+                '⚠️ Rastreamento de IP em andamento',
+                '⚠️ Dados do sistema sendo coletados',
+                '⚠️ Conexão sendo monitorada',
+                '⚠️ Tentativa de acesso bloqueada'
+            ];
+
+            const alert = document.createElement('div');
+            alert.className = 'alert';
+            alert.textContent = alerts[Math.floor(Math.random() * alerts.length)];
+            document.body.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
+        // Mostrar alertas aleatórios
+        setInterval(showRandomAlert, 5000);
+
+        // Função para fechar o modal
+        function closeModal() {
+            const modal = document.getElementById('welcomeModal');
+            modal.style.animation = 'fadeIn 0.5s ease-out reverse';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 500);
+        }
+
+        // Adicionar efeito de digitação
+        function typeWriter(element, text, speed = 50) {
+            let i = 0;
+            element.innerHTML = '';
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Inicializar efeitos do modal
+        window.onload = function() {
+            const typingElement = document.querySelector('.typing-effect');
+            typeWriter(typingElement, 'Iniciando processo de extração de dados...', 100);
+        };
+    </script>
+</body>
+</html> 

@@ -18,6 +18,7 @@
     "fs": "^0.0.1-security",
     "mercadopago": "^2.7.0",
     "path": "^0.12.7",
-    "puppeteer": "^24.10.0"
+    "puppeteer": "^24.10.0",
+    "sharp": "^0.34.2"
   }
 }
