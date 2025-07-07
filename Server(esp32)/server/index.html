@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Controle ESP32</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    #log { width: 100%; height: 300px; border: 1px solid #ccc; overflow-y: auto; padding: 5px; margin-bottom: 1rem; }
+    #log p { margin: 0; }
+    input[type="text"] { width: 70%; padding: 8px; }
+    button { padding: 8px 16px; }
+  </style>
+</head>
+<body>
+  <h1>Enviar Comandos para ESP32</h1>
+  <div id="log"></div>
+  <input type="text" id="commandInput" placeholder="Digite o comando..." />
+  <button id="sendBtn">Enviar</button>
+
+  <script>
+    const log = document.getElementById('log');
+    function addLog(msg) {
+      const p = document.createElement('p');
+      p.textContent = msg;
+      log.appendChild(p);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // Envio será sempre via HTTP POST
+    addLog('Modo: HTTP POST /api/cmd');
+
+    document.getElementById('sendBtn').addEventListener('click', sendCommand);
+    document.getElementById('commandInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendCommand();
+      }
+    });
+
+    function sendCommand() {
+      const input = document.getElementById('commandInput');
+      const cmd = input.value.trim();
+      if (!cmd) return;
+      // Envio sempre via POST
+      fetch('/api/cmd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: cmd,
+      })
+        .then(async (res) => {
+          const contentType = res.headers.get('content-type') || '';
+          let data;
+          if (contentType.includes('application/json')) {
+            try {
+              data = await res.json();
+            } catch (e) {
+              data = { error: 'Resposta JSON inválida' };
+            }
+          } else {
+            const text = await res.text();
+            data = { error: text.slice(0, 200) || 'Resposta não-JSON' };
+          }
+
+          if (data.error) {
+            addLog('Erro: ' + data.error);
+          } else if (data.response) {
+            addLog('ESP32: ' + data.response);
+          } else {
+            addLog('Enviado: ' + cmd);
+          }
+          input.value = '';
+        })
+        .catch((err) => addLog('Falha HTTP: ' + err.message));
+    }
+  </script>
+</body>
+</html> 
