@@ -2,75 +2,161 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Controle ESP32</title>
+  <title>Painel ESP32</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 2rem; }
-    #log { width: 100%; height: 300px; border: 1px solid #ccc; overflow-y: auto; padding: 5px; margin-bottom: 1rem; }
-    #log p { margin: 0; }
-    input[type="text"] { width: 70%; padding: 8px; }
-    button { padding: 8px 16px; }
+    #controls { margin-bottom: 1rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    select, input[type="text"] { padding: 8px; }
+    #commandInput { width: 300px; }
+    button { padding: 8px 16px; cursor: pointer; }
+    #log { width: 100%; height: 320px; border: 1px solid #ccc; overflow-y: auto; padding: 5px; }
+    #log p { margin: 0; font-family: monospace; }
   </style>
 </head>
 <body>
-  <h1>Enviar Comandos para ESP32</h1>
+  <h1>Painel de Controle ESP32</h1>
+
+  <div id="controls">
+    <label for="espSelect">ESP32:</label>
+    <select id="espSelect"></select>
+    <span id="espInfo"></span>
+    <button id="refreshBtn" title="Atualizar lista de ESP32s">🔄 Atualizar</button>
+    <input type="text" id="commandInput" placeholder="Digite o comando..." />
+    <button id="sendBtn">Enviar</button>
+  </div>
+
   <div id="log"></div>
-  <input type="text" id="commandInput" placeholder="Digite o comando..." />
-  <button id="sendBtn">Enviar</button>
+
+  <h2>ESPs conectados</h2>
+  <table id="espTable" border="1" cellpadding="4" cellspacing="0">
+    <thead>
+      <tr><th>ID</th><th>SSID</th><th>Email</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <script>
-    const log = document.getElementById('log');
+    // ======= Configurações de URL =======
+    const BASE_URL = ''; // Backend na mesma origem
+    const WS_URL   = location.origin.replace(/^http/, 'ws') + '/ws'; // WebSocket local
+
+    const logEl = document.getElementById('log');
+    const espSelect = document.getElementById('espSelect');
+    const cmdInput = document.getElementById('commandInput');
+
     function addLog(msg) {
       const p = document.createElement('p');
-      p.textContent = msg;
-      log.appendChild(p);
-      log.scrollTop = log.scrollHeight;
+      const ts = new Date().toLocaleTimeString();
+      p.textContent = `[${ts}] ${msg}`;
+      logEl.appendChild(p);
+      logEl.scrollTop = logEl.scrollHeight;
     }
 
-    // Envio será sempre via HTTP POST
-    addLog('Modo: HTTP POST /api/cmd');
+    // WebSocket para receber mensagens em tempo-real
+    function initWebSocket() {
+      const ws = new WebSocket(WS_URL);
+
+      ws.addEventListener('open', () => addLog('WebSocket conectado.'));
+      ws.addEventListener('message', (e) => addLog(e.data));
+      ws.addEventListener('close', () => {
+        addLog('WebSocket desconectado. Tentando reconectar em 3s...');
+        setTimeout(initWebSocket, 3000);
+      });
+      ws.addEventListener('error', (err) => addLog('Erro WebSocket: ' + err.message));
+    }
+    initWebSocket();
+
+    // Buscar lista de ESPs
+    async function fetchEspList() {
+      try {
+        const res = await fetch(BASE_URL + '/api/list', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        const json = await res.json();
+        console.log(json);
+
+        // Limpa tabela e dropdown
+        const tbody = document.querySelector('#espTable tbody');
+        tbody.innerHTML = '';
+        espSelect.innerHTML = json.length ? '' : '<option value="">Nenhum</option>';
+
+        json.forEach(item => {
+          let id, ssid = '', email = '';
+          if (Array.isArray(item)) {
+            id = item[0];
+            const info = item[1]?._espInfo || {};
+            ssid  = info.ssid  || '';
+            email = info.email || '';
+          } else if (item && typeof item === 'object') {
+            id = item.id || '';
+            ssid  = item.ssid  || '';
+            email = item.email || '';
+          } else {
+            id = item;
+          }
+
+          // dropdown
+          const opt = document.createElement('option');
+          opt.value = id;
+          opt.textContent = id;
+          espSelect.appendChild(opt);
+
+          // tabela
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${id}</td><td>${ssid}</td><td>${email}</td>`;
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        addLog('Falha ao obter /api/list: ' + e.message);
+      }
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', fetchEspList);
+    fetchEspList(); // inicial
+
+    // Enviar comando
+    async function sendCommand() {
+      const espId = espSelect.value;
+      const cmd = cmdInput.value.trim();
+      if (!espId) return addLog('Selecione um ESP32.');
+      if (!cmd) return;
+      const fullCmd = `${espId}:${cmd}`;
+      try {
+        const res = await fetch(BASE_URL + '/api/cmd', {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: fullCmd,
+        });
+        const data = await res.json().catch(() => ({ error: 'Resposta não-JSON' }));
+        if (data.error) {
+          addLog('Erro: ' + data.error);
+        } else if (data.response) {
+          addLog('Resposta ESP: ' + data.response);
+        } else {
+          addLog('Comando enviado: ' + fullCmd);
+        }
+        cmdInput.value = '';
+      } catch (e) {
+        addLog('Falha HTTP: ' + e.message);
+      }
+    }
 
     document.getElementById('sendBtn').addEventListener('click', sendCommand);
-    document.getElementById('commandInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        sendCommand();
-      }
+    cmdInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendCommand();
     });
 
-    function sendCommand() {
-      const input = document.getElementById('commandInput');
-      const cmd = input.value.trim();
-      if (!cmd) return;
-      // Envio sempre via POST
-      fetch('/api/cmd', {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: cmd,
-      })
-        .then(async (res) => {
-          const contentType = res.headers.get('content-type') || '';
-          let data;
-          if (contentType.includes('application/json')) {
-            try {
-              data = await res.json();
-            } catch (e) {
-              data = { error: 'Resposta JSON inválida' };
-            }
-          } else {
-            const text = await res.text();
-            data = { error: text.slice(0, 200) || 'Resposta não-JSON' };
-          }
-
-          if (data.error) {
-            addLog('Erro: ' + data.error);
-          } else if (data.response) {
-            addLog('ESP32: ' + data.response);
-          } else {
-            addLog('Enviado: ' + cmd);
-          }
-          input.value = '';
-        })
-        .catch((err) => addLog('Falha HTTP: ' + err.message));
-    }
+    // Atualiza info ao trocar ESP
+    espSelect.addEventListener('change', () => {
+      const selected = espSelect.value;
+      const row = [...document.querySelectorAll('#espTable tbody tr')].find(r => r.firstChild.textContent === selected);
+      if (row) {
+        document.getElementById('espInfo').textContent = `SSID: ${row.children[1].textContent} | Email: ${row.children[2].textContent}`;
+      } else {
+        document.getElementById('espInfo').textContent = '';
+      }
+    });
   </script>
 </body>
 </html> 
