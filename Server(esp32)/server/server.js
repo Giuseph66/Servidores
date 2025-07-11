@@ -5,6 +5,18 @@ const fs = require('fs');
 const path = require('path');
 
 const httpServer = http.createServer((req, res) => {
+  // ===== Habilita CORS para qualquer origem =====
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Responde imediatamente a preflight
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   if (req.method === 'POST' && req.url === '/api/cmd') {
     let body = '';
     req.on('data', (chunk) => (body += chunk));

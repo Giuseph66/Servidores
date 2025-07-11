@@ -14,9 +14,17 @@
   </style>
 </head>
 <body>
-  <h1>Painel de Controle ESP32</h1>
+  <div id="loginOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;">
+    <h2>Login</h2>
+    <input type="text" id="loginUser" placeholder="Usuário" style="padding:8px;margin-bottom:8px;"/>
+    <input type="password" id="loginPass" placeholder="Senha" style="padding:8px;margin-bottom:8px;"/>
+    <button id="loginBtn" style="padding:8px 16px;">Entrar</button>
+    <p id="loginError" style="color:red;margin-top:8px;"></p>
+  </div>
 
-  <div id="controls">
+  <h1 id="mainTitle" style="display:none;">Painel de Controle ESP32</h1>
+
+  <div id="controls" style="display:none;">
     <label for="espSelect">ESP32:</label>
     <select id="espSelect"></select>
     <span id="espInfo"></span>
@@ -25,10 +33,10 @@
     <button id="sendBtn">Enviar</button>
   </div>
 
-  <div id="log"></div>
+  <div id="log" style="display:none;"></div>
 
-  <h2>ESPs conectados</h2>
-  <table id="espTable" border="1" cellpadding="4" cellspacing="0">
+  <h2 id="espHeader" style="display:none;">ESPs conectados</h2>
+  <table id="espTable" border="1" cellpadding="4" cellspacing="0" style="display:none;">
     <thead>
       <tr><th>ID</th><th>SSID</th><th>Email</th></tr>
     </thead>
@@ -155,6 +163,26 @@
         document.getElementById('espInfo').textContent = `SSID: ${row.children[1].textContent} | Email: ${row.children[2].textContent}`;
       } else {
         document.getElementById('espInfo').textContent = '';
+      }
+    });
+
+    // ======= Autenticação simples =======
+    const AUTH_USER = 'jesusateu'; // ajuste conforme necessário
+    const AUTH_PASS = '123';
+
+    document.getElementById('loginBtn').addEventListener('click', () => {
+      const u = document.getElementById('loginUser').value.trim();
+      const p = document.getElementById('loginPass').value.trim();
+      if (u === AUTH_USER && p === AUTH_PASS) {
+        document.getElementById('loginOverlay').style.display = 'none';
+        // revelar conteúdo
+        document.getElementById('mainTitle').style.display = '';
+        document.getElementById('controls').style.display = 'flex';
+        document.getElementById('log').style.display = '';
+        document.getElementById('espHeader').style.display = '';
+        document.getElementById('espTable').style.display = '';
+      } else {
+        document.getElementById('loginError').textContent = 'Credenciais inválidas';
       }
     });
   </script>
