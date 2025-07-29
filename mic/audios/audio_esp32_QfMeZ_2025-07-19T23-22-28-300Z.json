@@ -1,0 +1,14 @@
+{
+  "espId": "QfMeZ",
+  "source": "main_server",
+  "timestamp": "2025-07-19T23:22:28.301Z",
+  "duration": 7534,
+  "chunks": 83,
+  "totalChunks": -1,
+  "size": 42000,
+  "sampleRate": 8000,
+  "bitsPerSample": 8,
+  "channels": 1,
+  "recordSeconds": 3,
+  "bufferSize": 24000
+}

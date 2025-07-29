@@ -4,6 +4,15 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
+// ===== INTEGRAÇÃO COM SERVIDOR DE ÁUDIO =====
+let audioServer = null;
+try {
+  audioServer = require('./servidor_audio.js');
+  console.log('🎙️ Servidor de áudio integrado');
+} catch (error) {
+  console.log('⚠️ Servidor de áudio não encontrado, funcionando sem processamento de áudio');
+}
+
 const httpServer = http.createServer((req, res) => {
   // ===== Habilita CORS para qualquer origem =====
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -44,7 +53,7 @@ const httpServer = http.createServer((req, res) => {
           return;
         }
 
-        const timeoutMs = 5000;
+        const timeoutMs = 10000;
         let responded = false;
 
         const timer = setTimeout(() => {
@@ -148,12 +157,19 @@ espWss.on('connection', function connection(ws) {
 
     // Escuta outras mensagens do ESP32
     ws.on('message', (msg) => {
-      console.log(`[${id}] =>`, msg.toString());
+      const messageStr = msg.toString();
+      console.log(`[${id}] =>`, messageStr);
+
+      // ===== PROCESSAMENTO DE ÁUDIO =====
+      if (audioServer && messageStr.startsWith('audio|')) {
+        console.log(`🎵 Processando áudio do ESP32 ${id}`);
+        audioServer.processAudioFromMainServer(id, messageStr);
+      }
 
       // Reencaminha para todos os clientes Web
       clientWss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
-          client.send(`[${id}] ${msg.toString()}`);
+          client.send(`[${id}] ${messageStr}`);
         }
       });
     });

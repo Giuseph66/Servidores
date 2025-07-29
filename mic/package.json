@@ -1,0 +1,37 @@
+{
+  "name": "esp32-audio-server",
+  "version": "1.0.0",
+  "description": "Servidor WebSocket para receber áudio do ESP32 com microfone MAX9814",
+  "main": "servidor_audio.js",
+  "scripts": {
+    "start": "node servidor_audio.js",
+    "dev": "nodemon servidor_audio.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "esp32",
+    "audio",
+    "websocket",
+    "microphone",
+    "max9814"
+  ],
+  "author": "Giuseph",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seu-usuario/esp32-audio-project"
+  },
+  "bugs": {
+    "url": "https://github.com/seu-usuario/esp32-audio-project/issues"
+  },
+  "homepage": "https://github.com/seu-usuario/esp32-audio-project#readme"
+} 
