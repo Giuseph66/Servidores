@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Emails</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-envelope"></i> Gerenciador de Emails</h1>
+                <p>Gerencie remetentes e visualize histórico de envios</p>
+                <div class="user-info">
+                    <span id="userDisplay">Bem-vindo!</span>
+                    <button class="btn btn-secondary" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <button class="nav-btn active" data-tab="remetentes">
+                <i class="fas fa-users"></i> Remetentes
+            </button>
+            <button class="nav-btn" data-tab="enviar">
+                <i class="fas fa-paper-plane"></i> Enviar Email
+            </button>
+            <button class="nav-btn" data-tab="historico">
+                <i class="fas fa-history"></i> Histórico
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Remetentes Tab -->
+            <div id="remetentes" class="tab-content active">
+                <div class="section-header">
+                    <h2>Gerenciar Remetentes</h2>
+                    <button class="btn btn-primary" onclick="showModal('addRemetenteModal')">
+                        <i class="fas fa-plus"></i> Novo Remetente
+                    </button>
+                </div>
+                
+                <div class="cards-container" id="remetentesContainer">
+                    <!-- Cards serão inseridos aqui -->
+                </div>
+            </div>
+
+            <!-- Enviar Email Tab -->
+            <div id="enviar" class="tab-content">
+                <div class="section-header">
+                    <h2>Enviar Email</h2>
+                </div>
+                
+                <div class="form-container">
+                    <form id="emailForm" class="email-form">
+                        <div class="form-group">
+                            <label for="remetente">Remetente:</label>
+                            <select id="remetente" name="remetente" required>
+                                <option value="">Selecione um remetente</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="destinatario">Destinatário:</label>
+                            <input type="email" id="destinatario" name="destinatario" required placeholder="destinatario@exemplo.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="assunto">Assunto:</label>
+                            <input type="text" id="assunto" name="assunto" required placeholder="Assunto do email">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="mensagem">Mensagem:</label>
+                            <textarea id="mensagem" name="mensagem" required placeholder="Digite sua mensagem aqui..." rows="6"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Enviar Email
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fas fa-undo"></i> Limpar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Histórico Tab -->
+            <div id="historico" class="tab-content">
+                <div class="section-header">
+                    <h2>Histórico de Emails</h2>
+                    <button class="btn btn-secondary" onclick="carregarHistorico()">
+                        <i class="fas fa-sync"></i> Atualizar
+                    </button>
+                </div>
+                
+                <!-- Desktop Table -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Remetente</th>
+                                <th>Destinatário</th>
+                                <th>Assunto</th>
+                                <th>Data</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historicoTable">
+                            <!-- Dados serão inseridos aqui -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Mobile Cards -->
+                <div class="email-history-cards" id="historicoCards">
+                    <!-- Cards serão inseridos aqui -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Remetente Modal -->
+    <div id="addRemetenteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Novo Remetente</h3>
+                <button class="modal-close" onclick="closeModal('addRemetenteModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addRemetenteForm" class="modal-form">
+                <div class="form-group">
+                    <label for="modalEmail">Email:</label>
+                    <input type="email" id="modalEmail" name="email" required placeholder="seu-email@gmail.com">
+                </div>
+                <div class="form-group">
+                    <label for="modalSenha">Senha:</label>
+                    <input type="password" id="modalSenha" name="senha" required placeholder="Sua senha de app">
+                    <small class="form-help">
+                        <i class="fas fa-info-circle"></i> 
+                        Para Gmail, use uma "Senha de App" em vez da senha normal
+                    </small>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Cadastrar
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addRemetenteModal')">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Email Modal -->
+    <div id="viewEmailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-envelope-open"></i> Detalhes do Email</h3>
+                <button class="modal-close" onclick="closeModal('viewEmailModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="emailDetails" class="email-details">
+                <!-- Detalhes do email serão inseridos aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="script.js"></script>
+    <script>
+        // Verificar autenticação ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+        });
+
+        function checkAuth() {
+            const isAuthenticated = localStorage.getItem('isAuthenticated');
+            const authTimestamp = localStorage.getItem('authTimestamp');
+            
+            if (!isAuthenticated || !authTimestamp) {
+                window.location.href = '/login';
+                return;
+            }
+            
+            // Verificar se o token ainda é válido (24 horas)
+            const now = Date.now();
+            const authTime = parseInt(authTimestamp);
+            const hoursDiff = (now - authTime) / (1000 * 60 * 60);
+            
+            if (hoursDiff >= 24) {
+                // Token expirado
+                localStorage.removeItem('isAuthenticated');
+                localStorage.removeItem('authUsername');
+                localStorage.removeItem('authTimestamp');
+                window.location.href = '/login';
+                return;
+            }
+            
+            // Atualizar display do usuário
+            const username = localStorage.getItem('authUsername');
+            if (username) {
+                document.getElementById('userDisplay').textContent = `Bem-vindo, ${username}!`;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('authUsername');
+            localStorage.removeItem('authTimestamp');
+            window.location.href = '/login';
+        }
+    </script>
+</body>
+</html> 
