@@ -8,8 +8,8 @@ const toastContainer = document.getElementById('toastContainer');
 
 // Credenciais padrão
 const DEFAULT_CREDENTIALS = {
-    username: 'admin',
-    password: 'admin123'
+    username: 'jesus_ateu',
+    password: '123456'
 };
 
 // Verificar se já está logado

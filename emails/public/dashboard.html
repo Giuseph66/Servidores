@@ -14,6 +14,9 @@
         <header class="header">
             <div class="header-content">
                 <h1><i class="fas fa-envelope"></i> Gerenciador de Emails</h1>
+                    <button class="btn btn-info" onclick="showModal('infoModal')">
+                        <i class="fas fa-info-circle"></i> API Info
+                    </button>
                 <p>Gerencie remetentes e visualize histórico de envios</p>
                 <div class="user-info">
                     <span id="userDisplay">Bem-vindo!</span>
@@ -181,6 +184,120 @@
         </div>
     </div>
 
+    <!-- API Info Modal -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-code"></i> API Documentation</h3>
+                <button class="modal-close" onclick="closeModal('infoModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="api-docs">
+                <div class="docs-section">
+                    <h4><i class="fas fa-server"></i> Base URL</h4>
+                    <div class="code-block">
+                        <code id="baseUrl">${window.location.origin}</code>
+                        <button class="btn btn-sm btn-secondary" onclick="copyToClipboard('baseUrl')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="docs-section">
+                    <h4><i class="fas fa-paper-plane"></i> Enviar Email</h4>
+                    <div class="endpoint-info">
+                        <span class="method post">POST</span>
+                        <span class="endpoint">/send-email</span>
+                    </div>
+                    <div class="code-block">
+                        <pre><code id="enviarCode">curl -X POST ${window.location.origin}/send-email \
+  -H "Content-Type: application/json" \
+  -d '{
+    "remetente": "seu-email@gmail.com",
+    "destinatario": "destino@exemplo.com",
+    "subject": "Assunto do email",
+    "message": "Conteúdo da mensagem"
+  }'</code></pre>
+                        <button class="btn btn-sm btn-secondary" onclick="copyToClipboard('enviarCode')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="docs-section">
+                    <h4><i class="fas fa-list"></i> Listar Remetentes</h4>
+                    <div class="endpoint-info">
+                        <span class="method get">GET</span>
+                        <span class="endpoint">/remetentes</span>
+                    </div>
+                    <div class="code-block">
+                        <pre><code id="listarRemetentesCode">curl ${window.location.origin}/remetentes</code></pre>
+                        <button class="btn btn-sm btn-secondary" onclick="copyToClipboard('listarRemetentesCode')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="docs-section">
+                    <h4><i class="fas fa-history"></i> Histórico de Emails</h4>
+                    <div class="endpoint-info">
+                        <span class="method get">GET</span>
+                        <span class="endpoint">/emails</span>
+                    </div>
+                    <div class="code-block">
+                        <pre><code id="historicoCode">curl ${window.location.origin}/emails</code></pre>
+                        <button class="btn btn-sm btn-secondary" onclick="copyToClipboard('historicoCode')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="docs-section">
+                    <h4><i class="fas fa-book"></i> Manual de Uso</h4>
+                    <div class="manual-content">
+                        <h5>1. Configuração do Gmail</h5>
+                        <ul>
+                            <li>Ative a verificação em duas etapas na sua conta Google</li>
+                            <li>Gere uma "Senha de App" em: <a href="https://myaccount.google.com/apppasswords" target="_blank">https://myaccount.google.com/apppasswords</a></li>
+                            <li>Use essa senha ao cadastrar o remetente</li>
+                        </ul>
+
+                        <h5>2. Fluxo de Uso</h5>
+                        <ol>
+                            <li>Cadastre um remetente com email e senha de app</li>
+                            <li>Use o remetente cadastrado para enviar emails</li>
+                            <li>Consulte o histórico para ver todos os envios</li>
+                        </ol>
+
+                        <h5>3. Exemplo JavaScript</h5>
+                        <div class="code-block">
+                            <pre><code id="jsExample">// Enviar email via JavaScript
+fetch('${window.location.origin}/send-email', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    remetente: 'seu-email@gmail.com',
+    destinatario: 'destino@exemplo.com',
+    subject: 'Teste via API',
+    message: 'Este é um teste de envio via API'
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Erro:', error));</code></pre>
+                            <button class="btn btn-sm btn-secondary" onclick="copyToClipboard('jsExample')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner">
@@ -197,6 +314,7 @@
         // Verificar autenticação ao carregar a página
         document.addEventListener('DOMContentLoaded', function() {
             checkAuth();
+            updateBaseUrl();
         });
 
         function checkAuth() {
@@ -234,6 +352,37 @@
             localStorage.removeItem('authUsername');
             localStorage.removeItem('authTimestamp');
             window.location.href = '/login';
+        }
+
+        function updateBaseUrl() {
+            const baseUrl = window.location.origin;
+            document.getElementById('baseUrl').textContent = baseUrl;
+            
+            // Atualizar todos os exemplos de código com a URL correta
+            const codeBlocks = document.querySelectorAll('code');
+            codeBlocks.forEach(block => {
+                if (block.textContent.includes('${window.location.origin}')) {
+                    block.textContent = block.textContent.replace(/\${window\.location\.origin}/g, baseUrl);
+                }
+            });
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent || element.innerText;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Código copiado para a área de transferência!', 'success');
+            }).catch(() => {
+                // Fallback para navegadores mais antigos
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('Código copiado para a área de transferência!', 'success');
+            });
         }
     </script>
 </body>
