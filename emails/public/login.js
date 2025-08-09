@@ -84,6 +84,10 @@ function showToast(message, type = 'info') {
 // Validar credenciais
 function validateCredentials(username, password) {
     // Verificar credenciais padrão
+    if (username === 'admin' && password === 'admin123') {
+        showToast('Acha mesmo que você é o admin?', 'error');
+        return false;
+    }
     if (username === DEFAULT_CREDENTIALS.username && password === DEFAULT_CREDENTIALS.password) {
         return true;
     }

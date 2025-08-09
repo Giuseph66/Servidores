@@ -160,7 +160,7 @@ app.post('/send-email', async (req, res) => {
       from: remetente,
       to: destinatario,
       subject,
-      text: message,
+      html: message,
     };
 
     try {
@@ -226,7 +226,7 @@ app.delete('/emails/:id', (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3500;
+const PORT = process.env.PORT || 3550;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
   console.log(`Interface web disponível em: http://localhost:${PORT}`);
